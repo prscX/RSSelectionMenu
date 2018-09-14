@@ -24,6 +24,51 @@
 
 import UIKit
 
+@objc public class RSSelectionMenuBridge: NSObject {
+    private var selectionMenu: RSSelectionMenu<Any>?
+    private var data: Array<String> = []
+    
+    @objc convenience public init(selectionType: Int, dataSource: Array<String>) {
+        self.init()
+
+        self.data = dataSource
+        let type: SelectionType?
+        
+        if (selectionType == 1) { type = .Multiple }
+        else { type = .Single }
+        
+        selectionMenu =  RSSelectionMenu(selectionType: type!, dataSource: self.data) { (cell, object, indexPath) in
+            cell.textLabel?.text = object as! String
+            
+            // Change tint color (if needed)
+            cell.tintColor = .orange
+        }
+    }
+    
+    @objc public func search(withPlaceHolder: String, tintColor: UIColor) {
+        // show searchbar with placeholder and tint color
+        selectionMenu?.showSearchBar(withPlaceHolder: withPlaceHolder, tintColor: tintColor) { (searchtext) -> ([String]) in
+            return self.data.filter({ $0.lowercased().hasPrefix(searchtext.lowercased()) })
+        }
+    }
+    
+    @objc public func selected(items: Array<String>) {
+        selectionMenu?.setSelectedItems(items: items) { (text, selected, selectedItems) in
+        }
+    }
+    
+    @objc public func show(from: UIViewController, presentationStyle: Int, title: String, action: String) {
+        if (presentationStyle == 0) {
+            selectionMenu?.show(style: .Actionsheet(title: title, action:action, height:nil), from: from)
+        } else if (presentationStyle == 1) {
+            selectionMenu?.show(style: .Alert(title: title, action:action, height:nil), from: from)
+        } else if (presentationStyle == 2) {
+            selectionMenu?.show(style: .Formsheet, from: from)
+        }
+    }
+}
+
+
 /// RSSelectionMenuController
 open class RSSelectionMenu<T>: UIViewController, UIPopoverPresentationControllerDelegate, UIGestureRecognizerDelegate {
 

@@ -27,8 +27,14 @@ import UIKit
 @objc public class RSSelectionMenuBridge: NSObject {
     private var selectionMenu: RSSelectionMenu<Any>?
     private var data: Array<String> = []
+
+    /// Selection menu willAppear handler
+    @objc public var onWillAppear:(() -> ())?
     
-    @objc convenience public init(selectionType: Int, dataSource: Array<String>) {
+    /// Selection menu dismissal handler
+    @objc public var onDismiss:((_ selectedItems: Array<Any>) -> ())?
+
+    @objc convenience public init(selectionType: Int, tickColor: UIColor, dataSource: Array<String>) {
         self.init()
 
         self.data = dataSource
@@ -41,7 +47,7 @@ import UIKit
             cell.textLabel?.text = object as! String
             
             // Change tint color (if needed)
-            cell.tintColor = .orange
+            cell.tintColor = tickColor
         }
     }
     
@@ -58,6 +64,8 @@ import UIKit
     }
     
     @objc public func show(from: UIViewController, presentationStyle: Int, title: String, action: String) {
+        selectionMenu?.onDismiss = self.onDismiss
+        
         if (presentationStyle == 0) {
             selectionMenu?.show(style: .Actionsheet(title: title, action:action, height:nil), from: from)
         } else if (presentationStyle == 1) {
@@ -67,7 +75,6 @@ import UIKit
         }
     }
 }
-
 
 /// RSSelectionMenuController
 open class RSSelectionMenu<T>: UIViewController, UIPopoverPresentationControllerDelegate, UIGestureRecognizerDelegate {
@@ -130,7 +137,7 @@ open class RSSelectionMenu<T>: UIViewController, UIPopoverPresentationController
     fileprivate var backgroundView = UIView()
     
     // MARK: - Life Cycle
-    
+
     convenience public init(dataSource: DataSource<T>, cellConfiguration configuration: @escaping UITableViewCellConfiguration<T>) {
         self.init(selectionType: .Single, dataSource: dataSource, cellConfiguration: configuration)
     }
@@ -413,6 +420,10 @@ extension RSSelectionMenu {
         else if case let .Actionsheet(title, action, height) = with {
             tobePresentController = getAlertViewController(style: .actionSheet, title: title, action: action, height: height)
             tobePresentController.setValue(self, forKey: contentViewController)
+            
+            tobePresentController.popoverPresentationController?.sourceView = self.view
+            tobePresentController.popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection()
+            tobePresentController.popoverPresentationController?.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
         }
         
         from.present(tobePresentController, animated: true, completion: nil)

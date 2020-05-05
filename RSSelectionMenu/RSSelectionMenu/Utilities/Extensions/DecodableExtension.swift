@@ -1,7 +1,8 @@
 //
-//  AssociatedObjectExtension.swift
+//  DecodableExtension.swift
+//  RSSelectionMenu
 //
-//  Copyright (c) 2017 Rushi Sangani
+//  Copyright (c) 2019 Rushi Sangani
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -23,35 +24,11 @@
 //
 
 import Foundation
-import CoreData
-
-// convert to dictionary
-public extension NSObject {
-    
-    // dictionary
-    @objc public func toDictionary() -> [String: AnyObject] {
-        
-        let propertiesDictionary : NSMutableDictionary = NSMutableDictionary()
-        
-        // check of object is NSManagedObject
-        if let object = self as? NSManagedObject {
-            let keys = Array(object.entity.attributesByName.keys)
-            propertiesDictionary.setDictionary(object.dictionaryWithValues(forKeys: keys))
-        }
-        else {
-            let model = Mirror(reflecting: self)
-            for (name, value) in model.children {
-                propertiesDictionary.setValue(value, forKey: name!)
-            }
-        }
-        return propertiesDictionary as! [String: AnyObject]
-    }
-}
 
 /// Decodable
 public extension Decodable {
     
-    /// convert model to dictionary
+    /// Convert model to dictionary
     func toDictionary() -> [String: Any] {
         
         // create dict

@@ -9,9 +9,11 @@
 import UIKit
 import RSSelectionMenu
 
+/// ViewController
 class ViewController: UITableViewController {
     
     //MARK: - Outlets
+    @IBOutlet weak var cellStyleSegment: UISegmentedControl!
     @IBOutlet weak var pushDetailLabel: UILabel!
     @IBOutlet weak var presentDetailLabel: UILabel!
     @IBOutlet weak var formsheetDetailLabel: UILabel!
@@ -30,9 +32,6 @@ class ViewController: UITableViewController {
     let simpleDataArray = ["Sachin", "Rahul", "Saurav", "Virat", "Suresh", "Ravindra", "Chris", "Steve", "Anil"]
     var simpleSelectedArray = [String]()
     
-    /// First Row as selected
-    var firstRowSelected = true
-    
     /// Data Array
     let dataArray = ["Sachin Tendulkar", "Rahul Dravid", "Saurav Ganguli", "Virat Kohli", "Suresh Raina", "Ravindra Jadeja", "Chris Gyle", "Steve Smith", "Anil Kumble"]
     var selectedDataArray = [String]()
@@ -45,10 +44,32 @@ class ViewController: UITableViewController {
     var users = [User]()
     var selectedUsers = [User]()
     
+    /// Bottom sheet actions
+    var bottomSheetActions = [BottomSheetAction]()
+    
+    /// First Row as selected
+    var firstRowSelected = true
+    
+    /// Cell Selection Style
+    var cellSelectionStyle: CellSelectionStyle = .tickmark
+    
     //MARK: - Life Cycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         prepareCustomData()
+        prepareBottomSheetData()
+    }
+    
+    // MARK: - Actions
+    
+    @IBAction func cellStyleChanged(_ sender: Any) {
+        cellSelectionStyle = cellStyleSegment.selectedSegmentIndex == 0 ? .tickmark : .checkbox
+    }
+    
+    @IBAction func menuButtonClicked(_ sender: UIBarButtonItem) {
+        showBottomSheet(fromBarButton: sender)
     }
 }
 
@@ -61,13 +82,13 @@ extension ViewController {
         
         // single selection
         
-        if indexPath.section == 0 {
+        if indexPath.section == 1 {
             
             switch indexPath.row {
             case 0:
-                self.showSingleSelectionMenu(style: .Push)
+                self.showSingleSelectionMenu(style: .push)
             case 1:
-                self.showSingleSelectionMenu(style: .Present)
+                self.showSingleSelectionMenu(style: .present)
             case 2:
                 self.showAsFormsheet()
             case 3:
@@ -82,26 +103,26 @@ extension ViewController {
         }
         
         // multi selection
-        else if indexPath.section == 1 {
+        else if indexPath.section == 2 {
 
             switch indexPath.row {
             case 0:
-                self.showWithMultiSelect(style: .Push)
+                self.showWithMultiSelect(style: .push)
             case 1:
                 self.showAsMultiSelectPopover(sender: cell!)
             case 2:
-                self.showWithMultiSelect(style: .Present)
+                self.showWithMultiSelect(style: .present)
             case 3:
-                self.showAsAlertController(style: .actionSheet, title: "Select Player", action: nil, height: nil)
+                self.showAsAlertController(style: .actionSheet, title: "Select Player", action: "Done", height: nil)
             default:
                 break
             }
         }
-        else {
+        else if indexPath.section == 3 {
             
             // custom cell
             if indexPath.row == 0 {
-                showWithCustomCell()
+                self.showWithCustomCell()
             }else {
                 self.showWithCustomModels()
             }
@@ -127,7 +148,15 @@ extension ViewController {
         users.append(User(id: 2, name: "Chris", organization: "Amazon"))
         users.append(User(id: 3, name: "John", organization: "Facebook"))
         users.append(User(id: 4, name: "Camila", organization: "AirBnb"))
-        users.append(User(id: 6, name: "D-12", organization: "Microsoft"))
+        users.append(User(id: 6, name: "Denial", organization: "Microsoft"))
+    }
+    
+    func prepareBottomSheetData() {
+        let camera = BottomSheetAction(iconName: "camera", title: "Camera")
+        let photoLibrary = BottomSheetAction(iconName: "media", title: "Photo Library")
+        let attachment = BottomSheetAction(iconName: "attachment", title: "Attachment")
+        let cancel = BottomSheetAction(iconName: nil, title: "Cancel")
         
+        bottomSheetActions.append(contentsOf: [camera, photoLibrary, attachment, cancel])
     }
 }

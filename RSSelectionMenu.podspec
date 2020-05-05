@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
           
 	s.name         = "RSSelectionMenu"
-  	s.version      = "5.2.1"
+  	s.version      = "6.1.0"
 
     s.summary      = "An elegant selection list or dropdown menu for iOS with single or multiple selections."
   	s.description  = <<-DESC
@@ -11,16 +11,16 @@ Pod::Spec.new do |s|
 
   	s.homepage     = "https://github.com/rushisangani/RSSelectionMenu"
 
-    s.screenshots  = "https://raw.githubusercontent.com/rushisangani/RSSelectionMenu/master/Images/01.gif", "https://raw.githubusercontent.com/rushisangani/RSSelectionMenu/master/Images/02.gif", "https://raw.githubusercontent.com/rushisangani/RSSelectionMenu/master/Images/03.gif"
+    s.screenshots  = "https://github.com/rushisangani/RSSelectionMenu/tree/master/Images/multi1.gif", "https://github.com/rushisangani/RSSelectionMenu/tree/master/Images/custom.gif"
 
   
   	s.license      = { :type => "MIT", :file => "LICENSE" }
   	s.author       = { "Rushi Sangani" => "rushisangani@gmail.com" }
-  	s.source       = { :git => "https://github.com/rushisangani/RSSelectionMenu.git", :tag => s.version }
+  	s.source       = { :git => "https://github.com/rushisangani/RSSelectionMenu.git", :tag => "v#{s.version}" }
 
     s.ios.deployment_target = '9.0'
   	s.source_files = "RSSelectionMenu/**/*.swift"
 
     s.requires_arc = true
-    s.pod_target_xcconfig = { "SWIFT_VERSION" => "4" }
+    s.swift_versions = ['4.2', '5.0', '5.1']
 end

@@ -1,5 +1,6 @@
 //
-//  RSSelectionMenu.h
+//  NSObjectExtension.swift
+//  RSSelectionMenu
 //
 //  Copyright (c) 2019 Rushi Sangani
 //
@@ -22,12 +23,28 @@
 //  THE SOFTWARE.
 //
 
-#import <UIKit/UIKit.h>
+import Foundation
+import CoreData
 
-//! Project version number for RSSelectionMenu.
-FOUNDATION_EXPORT double RSSelectionMenuVersionNumber;
-
-//! Project version string for RSSelectionMenu.
-FOUNDATION_EXPORT const unsigned char RSSelectionMenuVersionString[];
-
-// In this header, you should import all the public headers of your framework using statements like #import <RSSelectionMenu/PublicHeader.h>
+/// NSObject Extension
+public extension NSObject {
+    
+    /// Convert NSObject model to dictionary
+    @objc func toDictionary() -> [String: AnyObject] {
+        
+        let propertiesDictionary : NSMutableDictionary = NSMutableDictionary()
+        
+        // check of object is NSManagedObject
+        if let object = self as? NSManagedObject {
+            let keys = Array(object.entity.attributesByName.keys)
+            propertiesDictionary.setDictionary(object.dictionaryWithValues(forKeys: keys))
+        }
+        else {
+            let model = Mirror(reflecting: self)
+            for (name, value) in model.children {
+                propertiesDictionary.setValue(value, forKey: name!)
+            }
+        }
+        return propertiesDictionary as! [String: AnyObject]
+    }
+}

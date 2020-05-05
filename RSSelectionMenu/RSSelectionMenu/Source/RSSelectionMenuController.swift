@@ -25,6 +25,62 @@
 
 import UIKit
 
+@objc public class RSSelectionMenuBridge: NSObject {
+    private var selectionMenu: RSSelectionMenu<Any>?
+    private var data: Array<String> = []
+
+    /// Selection menu willAppear handler
+    @objc public var onWillAppear:(() -> ())?
+    
+    /// Selection menu dismissal handler
+    @objc public var onDismiss:((_ selectedItems: Array<Any>) -> ())?
+
+    @objc convenience public init(selectionType: Int, tickColor: UIColor, dataSource: Array<String>) {
+        self.init()
+
+        self.data = dataSource
+        let type: SelectionStyle?
+        
+        if (selectionType == 1) { type = .multiple }
+        else { type = .single }
+        
+        selectionMenu =  RSSelectionMenu(selectionStyle: type!, dataSource: self.data) { (cell, object, indexPath) in
+            cell.textLabel?.text = object as? String
+            
+            // Change tint color (if needed)
+            cell.tintColor = tickColor
+        }
+    }
+    
+    @objc public func search(withPlaceHolder: String, tintColor: UIColor) {
+        // show searchbar with placeholder and tint color
+        selectionMenu?.showSearchBar(withPlaceHolder: withPlaceHolder, barTintColor: tintColor) { (searchtext) -> ([String]) in
+            return self.data.filter({ $0.lowercased().hasPrefix(searchtext.lowercased()) })
+        }
+    }
+    
+    @objc public func selected(items: Array<String>) {
+//        selectionMenu?.setSelectedItems(items: items) { (text, selected, selectedItems) in
+//        }
+        
+        selectionMenu?.setSelectedItems(items: items) { [weak self] (item, index, isSelected, selectedItems) in
+        }
+    }
+    
+    @objc public func show(from: UIViewController, presentationStyle: Int, title: String, action: String) {
+        selectionMenu?.onDismiss = self.onDismiss
+
+        if (presentationStyle == 0) {
+            selectionMenu?.show(style: .actionSheet(title: title, action:action, height:nil), from: from)
+        } else if (presentationStyle == 1) {
+            selectionMenu?.show(style: .alert(title: title, action:action, height:nil), from: from)
+        } else if (presentationStyle == 2) {
+            selectionMenu?.show(style: .formSheet, from: from)
+        }
+    }
+}
+
+
 /// RSSelectionMenuController
 open class RSSelectionMenu<T>: UIViewController, UIPopoverPresentationControllerDelegate, UIGestureRecognizerDelegate {
 
